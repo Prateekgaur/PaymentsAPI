@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PaymentsAPI.Data;
 using PaymentsAPI.Repositories;
+using PaymentsAPI.Services;
 using System.Text;
 
 namespace PaymentsAPI
@@ -34,7 +35,16 @@ namespace PaymentsAPI
                     Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
             };
             });
-            
+
+            // Add repositories to the DI container
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            // Add other services and DbContext
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -46,15 +56,7 @@ namespace PaymentsAPI
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
-
-            // Add repositories to the DI container
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-            // Add other services and DbContext
-            builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+            }       
 
             app.UseAuthentication();
             app.UseAuthorization();

@@ -1,4 +1,6 @@
-﻿namespace PaymentsAPI.Utilities
+﻿using System.ComponentModel;
+
+namespace PaymentsAPI.Utilities
 {
     public static class Utilities
     {
@@ -9,5 +11,5 @@
             string hashedPassword = !string.IsNullOrEmpty(password) ? BCrypt.Net.BCrypt.HashPassword(password,salt) : string.Empty;
             return hashedPassword;
         }
-    }
+    }    
 }

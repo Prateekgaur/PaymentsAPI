@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PaymentsAPI.Models;
+using PaymentsAPI.DTOs;
 using PaymentsAPI.Services;
 
 [ApiController]
@@ -7,16 +7,16 @@ using PaymentsAPI.Services;
 public class AuthController : ControllerBase
 {
     private readonly IUserService _userService;
-    private readonly AuthService _authService;
+    private readonly IAuthService _authService;
 
-    public AuthController(IUserService userService, AuthService authService)
+    public AuthController(IUserService userService, IAuthService authService)
     {
         _userService = userService;
         _authService = authService;
     }
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
+    public IActionResult Login([FromBody] LoginRequestDto request)
     {
         var user = _userService.Authenticate(request.Username, request.Password);
         if (user == null)

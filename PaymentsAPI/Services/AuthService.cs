@@ -6,7 +6,7 @@ using System.Text;
 
 namespace PaymentsAPI.Services
 {
-    public class AuthService
+    public class AuthService:IAuthService
     {
         private readonly IConfiguration _configuration;
 
