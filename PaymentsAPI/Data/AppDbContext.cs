@@ -21,24 +21,28 @@ namespace PaymentsAPI.Data
         {
             // Configure User entity
             modelBuilder.Entity<User>()
-                .HasKey(u => u.Id); // Primary key
+                .HasKey(u => u.Id); 
 
             modelBuilder.Entity<User>()
                 .Property(u => u.Id)
-                .ValueGeneratedOnAdd(); // Auto-increment
+                .ValueGeneratedOnAdd(); 
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.Role)
+                .HasDefaultValue("User"); 
 
             // Configure Payment entity
             modelBuilder.Entity<Payment>()
-                .HasKey(p => p.Id); // Primary key
+                .HasKey(p => p.Id); 
 
             modelBuilder.Entity<Payment>()
                 .Property(p => p.Id)
-                .ValueGeneratedOnAdd(); // Auto-increment
+                .ValueGeneratedOnAdd(); 
 
             modelBuilder.Entity<Payment>()
             .Property(p => p.Status)
             .HasConversion<string>()
-            .HasDefaultValue(PaymentStatus.Pending); // Store enums as strings
+            .HasDefaultValue(PaymentStatus.Pending);
         }
     }    
 }

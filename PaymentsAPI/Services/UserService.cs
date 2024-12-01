@@ -1,4 +1,6 @@
-﻿using PaymentsAPI.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using PaymentsAPI.Data;
+using PaymentsAPI.DTOs;
 using PaymentsAPI.Models;
 
 namespace PaymentsAPI.Services
@@ -12,49 +14,42 @@ namespace PaymentsAPI.Services
             _context = context;
         }
 
-        /// <summary>
-        /// Authenticate a user based on username and password.
-        /// </summary>
-        /// <param name="username">The user's username.</param>
-        /// <param name="password">The user's plain-text password.</param>
-        /// <returns>The authenticated user or null if authentication fails.</returns>
-        public User Authenticate(string username, string password)
+        public async Task<int> RegisterUser(LoginRequestDto request, bool isAdmin, int balance)
         {
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-                return null;
-
+            if(request is null || string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
+            {
+                return 0;
+            }
+            var isExists = await GetUserByUsername(request.Username) != null ? true : false;
+            if (isExists)
+            {
+                return -1;
+            }
+            User user = new User();
+            user.Username = request.Username;
+            user.PasswordHash = Utilities.Utilities.HashPassword(request.Password);
+            user.Role = isAdmin ? "Admin" : "User";
+            user.Balance = balance;
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return user.Id;
+        }
+        
+        public async Task<User> Login(string username, string password)
+        {
             // Retrieve the user by username
-            var user = _context.Users.SingleOrDefault(u => u.Username == username);
+            var user = await GetUserByUsername(username);
             if (user == null)
                 return null;
-
-            string hashedPassword = Utilities.Utilities.HashPassword(password);
-
-            // Verify password (you should use hashed password verification in production)
-            if (user.PasswordHash != hashedPassword) // Replace with proper password hashing
+            if (!Utilities.Utilities.VerifyPassword(password, user.PasswordHash))
                 return null;
 
             return user;
         }
 
-        /// <summary>
-        /// Retrieve a user by their unique ID.
-        /// </summary>
-        /// <param name="userId">The user's ID.</param>
-        /// <returns>The user object or null if not found.</returns>
-        public User GetUserById(int userId)
+        public async Task<User> GetUserByUsername(string username)
         {
-            return _context.Users.Find(userId);
-        }
-
-        /// <summary>
-        /// Retrieve a user by their username.
-        /// </summary>
-        /// <param name="username">The user's username.</param>
-        /// <returns>The user object or null if not found.</returns>
-        public User GetUserByUsername(string username)
-        {
-            return _context.Users.SingleOrDefault(u => u.Username == username);
+            return await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
         }
     }
 }

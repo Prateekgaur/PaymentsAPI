@@ -1,11 +1,12 @@
-﻿using PaymentsAPI.Models;
+﻿using PaymentsAPI.DTOs;
+using PaymentsAPI.Models;
 
 namespace PaymentsAPI.Services
 {
     public interface IUserService
     {
-        User Authenticate(string username, string password);
-        User GetUserById(int userId);
-        User GetUserByUsername(string username);
+        Task<User> Login(string username, string password);
+        Task<User> GetUserByUsername(string username);
+        Task<int> RegisterUser(LoginRequestDto request, bool isAdmin, int balance);
     }
 }
