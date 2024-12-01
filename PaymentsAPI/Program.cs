@@ -40,19 +40,27 @@ namespace PaymentsAPI
 
             // Add repositories to the DI container
             builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IPaymentService,PaymentService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
             // Add other services and DbContext
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));            
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
+
+            // Add JWTMiddleware before authentication middleware
+            app.UseMiddleware<JWTMiddleware>();
+
+            app.UseCors(policy => policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }       
+            }
 
             app.UseAuthentication();
             app.UseAuthorization();
