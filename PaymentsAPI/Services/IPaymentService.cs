@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using PaymentsAPI.DTOs;
 using PaymentsAPI.Models;
 
 namespace PaymentsAPI.Services
@@ -12,5 +11,7 @@ namespace PaymentsAPI.Services
         Task<IEnumerable<Payment>> GetPaymentsByRecipientIdAsync(int recipientId);
         Task<bool> UpdatePaymentStatusAsync(int paymentId, PaymentStatus status);
         Task<bool> CancelPaymentAsync(int paymentId);
+        Task<(bool Success, string Message, int PaymentId)> InitiatePaymentAsync(PaymentRequestDto request);
+
     }
 }

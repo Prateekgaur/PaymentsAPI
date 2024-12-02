@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using PaymentsAPI.Data;
+using PaymentsAPI.DTOs;
 using PaymentsAPI.Models;
 
 namespace PaymentsAPI.Services
@@ -122,6 +123,11 @@ namespace PaymentsAPI.Services
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public Task<(bool Success, string Message, int PaymentId)> InitiatePaymentAsync(PaymentRequestDto request)
+        {
+            throw new NotImplementedException();
         }
     }
 }

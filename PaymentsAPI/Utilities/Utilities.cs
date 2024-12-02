@@ -29,14 +29,16 @@ namespace PaymentsAPI.Utilities
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                 new Claim("Role", user.Role),
-                new Claim("UserId", user.Id.ToString())
+                new Claim("UserId", user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
             };
 
+            int expiry = Int32.Parse(_configuration["Jwt:ExpiryInHours"]);
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddHours(2),
+                expires: DateTime.Now.AddHours(expiry),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
