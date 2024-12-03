@@ -58,7 +58,7 @@ namespace PaymentsAPI.Services
 
                 if (payment.Status == PaymentStatus.Succeed)
                     return (false, "Payment already succeeded.");
-                if (retriedPayment && payment.Status == PaymentStatus.Pending)
+                if (retriedPayment && payment.Status == PaymentStatus.Pending && payment.Tries > 5)
                 {
                     return (false, "Only failed payment can be retried");
                 }
