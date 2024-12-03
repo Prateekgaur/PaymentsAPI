@@ -14,7 +14,7 @@ namespace PaymentsAPI.Models
         public string PaymentMethod { get; set; }
         public int RecipientId { get; set; } // recipient's User Id
         public PaymentStatus Status { get; set; } = PaymentStatus.Pending; // Default status
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Timestamp for payment creation
+        public DateTime CreatedAt { get; set; } = DateTime.Now; // Timestamp for payment creation
         public DateTime? UpdatedAt { get; set; } // Timestamp for the last status update
     }
     public enum PaymentStatus

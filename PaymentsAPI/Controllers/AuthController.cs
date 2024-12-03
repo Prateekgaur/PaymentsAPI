@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PaymentsAPI.DTOs;
-using PaymentsAPI.Models;
 using PaymentsAPI.Services;
 using PaymentsAPI.Utilities;
 
@@ -18,11 +16,6 @@ public class AuthController : ControllerBase
         _configuration = configuration;
     }
 
-    /// <summary>
-    /// Register user
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] LoginRequestDto request, bool isAdmin = false)
     {
@@ -32,7 +25,7 @@ public class AuthController : ControllerBase
         }
         var balance = 500;
         int userId = await _userService.RegisterUser(request, isAdmin, balance);
-        if (userId > 0) 
+        if (userId > 0)
         {
             return Ok(new { Message = "User registered successfully." });
         }
@@ -58,9 +51,9 @@ public class AuthController : ControllerBase
         if (user == null)
             return Unauthorized("Invalid username or password.");
 
-        var token = Utilities.GenerateJwtToken(user,_configuration);
+        var token = Utilities.GenerateJwtToken(user, _configuration);
 
         return Ok(new { Token = token });
-       
+
     }
 }

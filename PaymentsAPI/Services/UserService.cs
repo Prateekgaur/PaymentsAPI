@@ -7,16 +7,16 @@ namespace PaymentsAPI.Services
 {
     public class UserService : IUserService
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _dbContext;
 
-        public UserService(AppDbContext context)
+        public UserService(AppDbContext dbContext)
         {
-            _context = context;
+            _dbContext = dbContext;
         }
 
         public async Task<int> RegisterUser(LoginRequestDto request, bool isAdmin, int balance)
         {
-            if(request is null || string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
+            if (request is null || string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
             {
                 return 0;
             }
@@ -25,16 +25,18 @@ namespace PaymentsAPI.Services
             {
                 return -1;
             }
-            User user = new User();
-            user.Username = request.Username;
-            user.PasswordHash = Utilities.Utilities.HashPassword(request.Password);
-            user.Role = isAdmin ? "Admin" : "User";
-            user.Balance = balance;
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            User user = new User()
+            {
+                Username = request.Username,
+                PasswordHash = Utilities.Utilities.HashPassword(request.Password),
+                Role = isAdmin ? "Admin" : "User",
+                Balance = balance
+            };
+            _dbContext.Users.Add(user);
+            await _dbContext.SaveChangesAsync();
             return user.Id;
         }
-        
+
         public async Task<User> Login(string username, string password)
         {
             // Retrieve the user by username
@@ -49,7 +51,12 @@ namespace PaymentsAPI.Services
 
         public async Task<User> GetUserByUsername(string username)
         {
-            return await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
+            return await _dbContext.Users.SingleOrDefaultAsync(u => u.Username == username);
+        }
+
+        public async Task<User> GetUserById(int userId)
+        {
+            return await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == userId);
         }
     }
 }
