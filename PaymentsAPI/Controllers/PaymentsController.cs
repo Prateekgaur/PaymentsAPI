@@ -52,7 +52,7 @@ namespace PaymentsAPI.Controllers
             }
             Payment payment = new Payment()
             {
-                PayerId = userId,
+                UserId = userId,
                 Amount = request.Amount,
                 RecipientId = request.RecipientId,
                 PaymentMethod = request.PaymentMethod,

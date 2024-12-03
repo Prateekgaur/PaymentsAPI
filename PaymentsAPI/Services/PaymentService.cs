@@ -23,7 +23,7 @@ namespace PaymentsAPI.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var payer = await _context.Users.FindAsync(payment.PayerId);
+                var payer = await _context.Users.FindAsync(payment.UserId);
                 var recipient = await _context.Users.FindAsync(payment.RecipientId);
                 if (payer is null || recipient is null)
                 {
@@ -62,7 +62,7 @@ namespace PaymentsAPI.Services
                 {
                     return (false, "Only failed payment can be retried");
                 }
-                var payer = await _context.Users.FindAsync(payment.PayerId);
+                var payer = await _context.Users.FindAsync(payment.UserId);
                 var recipient = await _context.Users.FindAsync(payment.RecipientId);
 
                 if (payer is null || recipient is null)
@@ -101,7 +101,7 @@ namespace PaymentsAPI.Services
                 if (payment.Status == PaymentStatus.Failed)
                     return (false, "Payment already failed.");
 
-                var payer = await _context.Users.FindAsync(payment.PayerId);
+                var payer = await _context.Users.FindAsync(payment.UserId);
                 var recipient = await _context.Users.FindAsync(payment.RecipientId);
 
                 if (payer is null || recipient is null)
