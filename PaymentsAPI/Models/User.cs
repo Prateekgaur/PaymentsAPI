@@ -1,5 +1,4 @@
-﻿using PaymentsAPI.Utilities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PaymentsAPI.Models
 {
@@ -8,9 +7,10 @@ namespace PaymentsAPI.Models
         [Key]
         public int Id { get; set; }
         public string Username { get; set; }
-        public string PasswordHash { get; set; } // Store hashed passwords, not plain text
-        public string Role { get; set; } = "User"; // For role-based authorization (e.g., Admin, User)
-        public decimal Balance { get; set; } // To simulate available balance for payment
+        public string PasswordHash { get; set; }
+        public string Role { get; set; } = "User";
+        public decimal Balance { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public ICollection<Payment> Payments { get; set; }
     }
 }

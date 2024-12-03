@@ -23,7 +23,7 @@ namespace PaymentsAPI.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var payer = await _context.Users.FindAsync(payment.UserId);
+                var payer = await _context.Users.FindAsync(payment.PayerId);
                 var recipient = await _context.Users.FindAsync(payment.RecipientId);
                 if (payer is null || recipient is null)
                 {
@@ -47,7 +47,7 @@ namespace PaymentsAPI.Services
             }
         }
 
-        public async Task<(bool Success, string Message)> CompletePaymentAsync(int paymentId)
+        public async Task<(bool Success, string Message)> CompletePaymentAsync(int paymentId, bool retriedPayment = false)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -56,18 +56,24 @@ namespace PaymentsAPI.Services
                 if (payment == null)
                     return (false, "Payment not found.");
 
-                if (payment.Status != PaymentStatus.Pending)
-                    return (false, "Only pending payments can be completed.");
-
-                var payer = await _context.Users.FindAsync(payment.UserId);
+                if (payment.Status == PaymentStatus.Succeed)
+                    return (false, "Payment already succeeded.");
+                if (retriedPayment && payment.Status == PaymentStatus.Pending)
+                {
+                    return (false, "Only failed payment can be retried");
+                }
+                var payer = await _context.Users.FindAsync(payment.PayerId);
                 var recipient = await _context.Users.FindAsync(payment.RecipientId);
 
                 if (payer is null || recipient is null)
                 {
                     return (false, "Invalid payer or recipient details in database.");
                 }
+
                 payer.Balance -= payment.Amount;
                 recipient.Balance += payment.Amount;
+
+                payment.Tries += 1;
                 payment.Status = PaymentStatus.Succeed;
                 payment.UpdatedAt = DateTime.Now;
                 await _context.SaveChangesAsync();
@@ -90,10 +96,12 @@ namespace PaymentsAPI.Services
                 if (payment == null)
                     return (false, "Payment not found.");
 
-                if (payment.Status != PaymentStatus.Pending)
-                    return (false, "Only pending payments can be cancelled.");
+                if (payment.Status == PaymentStatus.Succeed)
+                    return (false, "Payment already succeeded.");
+                if (payment.Status == PaymentStatus.Failed)
+                    return (false, "Payment already failed.");
 
-                var payer = await _context.Users.FindAsync(payment.UserId);
+                var payer = await _context.Users.FindAsync(payment.PayerId);
                 var recipient = await _context.Users.FindAsync(payment.RecipientId);
 
                 if (payer is null || recipient is null)
@@ -101,6 +109,7 @@ namespace PaymentsAPI.Services
                     return (false, "Invalid payer or recipient details in database.");
                 }
 
+                payment.Tries = 1;
                 payment.Status = PaymentStatus.Failed;
                 payment.UpdatedAt = DateTime.Now;
                 await _context.SaveChangesAsync();
@@ -112,6 +121,11 @@ namespace PaymentsAPI.Services
                 await transaction.RollbackAsync();
                 return (false, $"Payment cancellation failed: {ex.Message}");
             }
+        }
+
+        public async Task<(bool Success, string Message)> RetryPaymentAsync(int paymentId)
+        {
+            return await CompletePaymentAsync(paymentId, true);
         }
     }
 }

@@ -9,13 +9,14 @@ namespace PaymentsAPI.Models
         [Key]
         public int Id { get; set; }
         [ForeignKey("User")]
-        public int UserId { get; set; } // Foreign key to User
+        public int PayerId { get; set; }
         public decimal Amount { get; set; }
         public string PaymentMethod { get; set; }
-        public int RecipientId { get; set; } // recipient's User Id
-        public PaymentStatus Status { get; set; } = PaymentStatus.Pending; // Default status
-        public DateTime CreatedAt { get; set; } = DateTime.Now; // Timestamp for payment creation
-        public DateTime? UpdatedAt { get; set; } // Timestamp for the last status update
+        public int RecipientId { get; set; }
+        public int Tries { get; set; } = 0;
+        public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
     }
     public enum PaymentStatus
     {

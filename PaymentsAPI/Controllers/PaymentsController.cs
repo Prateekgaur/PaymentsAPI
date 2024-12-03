@@ -52,7 +52,7 @@ namespace PaymentsAPI.Controllers
             }
             Payment payment = new Payment()
             {
-                UserId = userId,
+                PayerId = userId,
                 Amount = request.Amount,
                 RecipientId = request.RecipientId,
                 PaymentMethod = request.PaymentMethod,
@@ -90,7 +90,17 @@ namespace PaymentsAPI.Controllers
             if (!result.Success)
                 return BadRequest(result.Message);
 
-            return Ok("Payment canceled successfully.");
+            return Ok(result.Message);
+        }
+
+        [HttpPut("{id}/retry")]
+        public async Task<IActionResult> RetryPayment(int id)
+        {
+            var result = await _paymentService.RetryPaymentAsync(id);
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return Ok(result.Message);
         }
     }
 
